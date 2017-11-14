@@ -13,55 +13,21 @@
 
 // return a matrix (an array of arrays) representing a single nxn chessboard, with n rooks placed such that none of them can attack each other
 
-//rook, row conflict, column conflict
-
-//queen, row, column and diagonals both ways
-
-
-//var hasQueenConflicts = function
+// function N(Q,u,ee,n,s,H,R){
+//  s=0;
+//  Q=u?Q:(1<<Q)-1;
+//  H=~(u|ee|n)&Q;
+//  while(H)H^=R=-H&H,
+//  s+=N(Q,(u|R)<<1,ee|R,(n|R)>>1);
+//  return s+=ee==Q;
+// }//
 
 window.findNRooksSolution = function(n) {
   var solution = new Board({n:n});
-  var counter = 0;
-
-  //recursion base cases
-    //found a solution, return solution board, (number of rooks = n, no conflicts)
-    //find a dead end, where we can't place a piece in that row return nothing?
-
-  var placeRook = function(row) {
-    //place the rook at the first available slot that won't cause conflict
-    //after placing rook, if we have n rooks, we win, return the board
-    if (row === n) {
-      return solution.rows();
-    }
-
-    for (var i = 0; i < n; i++) {
-      solution.togglePiece(row, i);
-      counter ++;
-
-      //check to see if we have a conflict
-      var conflict = solution.hasAnyRooksConflicts();
-
-      //if there is a conflict, reset to 0, continue trying to place the same piece
-      //if no conflict, we move on to placing a new piece on a new row
-      if (conflict) {
-        //change the 1 back to a 0
-        solution.togglePiece(row, i);
-        counter --;
-      } else {
-        //if not, call placeRook on the next row, as long as row is <= n
-        if (row < n) {
-          return placeRook(row + 1);
-        }
-      }
-    }
-    //if there are no safe spaces available in the whole row, return -1;
-    return -1
+  for (var i = 0; i < n; i++) {
+    solution.togglePiece(i, i);
   }
-
-
-  //console.log('Single solution for ' + n + ' rooks:', JSON.stringify(solution));
-  return placeRook(0);
+  return solution.rows();
 };
 
 // return the number of nxn chessboards that exist, with n rooks placed such that none of them can attack each other
