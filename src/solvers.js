@@ -59,46 +59,91 @@ window.countNRooksSolutions = function(n) {
 // return a matrix (an array of arrays) representing a single nxn chessboard, with n queens placed such that none of them can attack each other
 window.findNQueensSolution = function(n) {
   var solution = new Board({n: n});
-  var found = false;
-  var result = [];
-
-  if (n === 2 || n === 3) {
+  var result;
+  if (n === 0 || n === 2 || n === 3) {
     return solution.rows();
   }
+  if (n === 1) {
+    solution.togglePiece(0, 0);
+    return solution.rows();
+  }
+  var pattern1 = function (i, n) {
+    solution.togglePiece(i, 2 * i + 1);
+    solution.togglePiece((n / 2) + i, (2 * i));
+  };
+  var pattern2 = function (i, n) {
+    //make a variable to calculate the second part of toggle piece
+    //if the second part is a negative value, translate it to its proper positive version
+    //so toggle piece can work properly
+    solution.togglePiece(i, (2 * (i+1) + (n/2) - 3 % n));
+    solution.togglePiece(n - (i+1), n - 1 - (2 * (i+1) + (n/2) - 3 % n));
+  };
 
-  var copyBoard = function() {
-    var rows = solution.rows();
-    result = [];
-    var row = [];
-      for (var i = 0; i < n; i++) {
-        for (var j = 0; j < n; j++) {
-          row.push(rows[i][j]);
-        }
-        result.push(row);
-        row = [];
-      }
+  var odd = false;
+
+  for (var i = 0; i < Math.floor((n / 2)); i++) {
+
+    if (n % 2 === 0 && n % 6 !== 2) {
+      pattern1(i, n);
+    } else if (n % 2 === 0 && n % 6 !== 0) {
+      pattern2(i, n);
+    } else if (n % 2 === 1 && ((n-1) % 2 === 0 && ((n-1) % 6 !== 2))) {
+      odd = true;
+      pattern1(i, n - 1);
+
+    } else if (n % 2 === 1 && ((n-1) % 2 === 0 && (n-1) % 6 !== 0)) {
+      odd = true;
+      pattern2(i, n - 1);
+    }
   }
 
-  var placeQueen = function(row) {
-    if (row === n) {
-      copyBoard();
-      return;
+  if (odd) {
+      solution.togglePiece(n-1, n-1);
     }
 
-    for (var i = 0; i < n; i++) {
-      solution.togglePiece(row, i);
-      if (!solution.hasAnyQueensConflicts()) {
-        placeQueen(row + 1);
-      }
-      if (found) {
-        return;
-      }
-      solution.togglePiece(row, i);
-    }
-  }
+  return solution.rows();
 
-  placeQueen(0);
-  return result;
+
+  // var found = false;
+  // var result = [];
+
+  // if (n === 2 || n === 3) {
+  //   return solution.rows();
+  // }
+
+  // var copyBoard = function() {
+  //   var rows = solution.rows();
+  //   result = [];
+  //   var row = [];
+  //     for (var i = 0; i < n; i++) {
+  //       for (var j = 0; j < n; j++) {
+  //         row.push(rows[i][j]);
+  //       }
+  //       result.push(row);
+  //       row = [];
+  //     }
+  // }
+
+  // var placeQueen = function(row) {
+  //   if (row === n) {
+  //     copyBoard();
+  //     return;
+  //   }
+
+  //   for (var i = 0; i < n; i++) {
+  //     solution.togglePiece(row, i);
+  //     if (!solution.hasAnyQueensConflicts()) {
+  //       placeQueen(row + 1);
+  //     }
+  //     if (found) {
+  //       return;
+  //     }
+  //     solution.togglePiece(row, i);
+  //   }
+  // }
+
+  // placeQueen(0);
+  // return result;
 
 };
 
