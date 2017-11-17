@@ -95,25 +95,21 @@ window.findNQueensSolution = function(n) {
 
 // return the number of nxn chessboards that exist, with n queens placed such that none of them can attack each other
 window.countNQueensSolutions = function(n) {
-  var solutionCount = 0;
-  var solution = new Board({n:n});
+  var count = 0;
+  var stencil = Math.pow(2, n) - 1
 
-  var placeQueen = function(row) {
-    if (row === n) {
-      solutionCount ++;
+  var placeQueen = function (lDiagonal, column, rDiagonal) {
+    if (column === stencil) {
+      count ++;
       return;
     }
-
-    for (var i = 0; i < n; i++) {
-      solution.togglePiece(row, i);
-      if (!solution.hasAnyQueensConflicts()) {
-        placeQueen(row + 1);
-      }
-      solution.togglePiece(row, i);
+    var safe = ~(lDiagonal | column | rDiagonal);
+    while (safe & stencil) {
+      var queen = safe & -safe;
+      safe -= queen;
+      placeQueen ((lDiagonal | queen) >> 1, column | queen, (rDiagonal | queen) << 1);
     }
-  }
-  placeQueen(0);
-  //console.log('Number of solutions for ' + n + ' rooks:', solutionCount);
-  return solutionCount;
+  };
+  placeQueen(0, 0, 0);
+  return count;
 };
-
