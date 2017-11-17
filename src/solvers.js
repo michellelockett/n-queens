@@ -23,27 +23,23 @@ window.findNRooksSolution = function(n) {
 
 // return the number of nxn chessboards that exist, with n rooks placed such that none of them can attack each other
 window.countNRooksSolutions = function(n) {
-  var solutionCount = 0;
-  var solution = new Board({n:n});
+  var count = 0;
+  var stencil = Math.pow(2, n) - 1;
 
-  var placeRook = function(row) {
-    if (row === n) {
-      solutionCount ++;
+  var placeRook = function (columns) {
+    if (stencil === columns) {
+      count ++;
       return;
     }
-
-    for (var i = 0; i < n; i++) {
-      solution.togglePiece(row, i);
-      if (!solution.hasAnyRooksConflicts()) {
-          placeRook(row + 1);
-      }
-      solution.togglePiece(row, i);
+    var safe = ~(columns);
+    while (safe & stencil) {
+      var rook = safe & -safe;
+      safe -= rook;
+      placeRook (columns | rook);
     }
   }
-
   placeRook(0);
-  //console.log('Number of solutions for ' + n + ' rooks:', solutionCount);
-  return solutionCount;
+  return count;
 };
 
 // return a matrix (an array of arrays) representing a single nxn chessboard, with n queens placed such that none of them can attack each other
@@ -98,16 +94,16 @@ window.countNQueensSolutions = function(n) {
   var count = 0;
   var stencil = Math.pow(2, n) - 1
 
-  var placeQueen = function (lDiagonal, column, rDiagonal) {
-    if (column === stencil) {
+  var placeQueen = function (lDiagonal, columns, rDiagonal) {
+    if (columns === stencil) {
       count ++;
       return;
     }
-    var safe = ~(lDiagonal | column | rDiagonal);
+    var safe = ~(lDiagonal | columns | rDiagonal);
     while (safe & stencil) {
       var queen = safe & -safe;
       safe -= queen;
-      placeQueen ((lDiagonal | queen) >> 1, column | queen, (rDiagonal | queen) << 1);
+      placeQueen ((lDiagonal | queen) >> 1, columns | queen, (rDiagonal | queen) << 1);
     }
   };
   placeQueen(0, 0, 0);
