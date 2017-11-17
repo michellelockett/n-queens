@@ -92,20 +92,28 @@ window.findNQueensSolution = function(n) {
 // return the number of nxn chessboards that exist, with n queens placed such that none of them can attack each other
 window.countNQueensSolutions = function(n) {
   var count = 0;
-  var stencil = Math.pow(2, n) - 1
+  var stencil = Math.pow(2, n) - 1;
+  var firstStencil = Math.pow(2, Math.floor(n/2)) - 1;
 
-  var placeQueen = function (lDiagonal, columns, rDiagonal) {
+
+  if (n === 0 || n === 1) {
+    return 1;
+  }
+
+  var placeQueen = function (lDiagonal, columns, rDiagonal, filter1, filter2) {
     if (columns === stencil) {
       count ++;
       return;
     }
-    var safe = ~(lDiagonal | columns | rDiagonal);
-    while (safe & stencil) {
+    var safe = ~(lDiagonal | columns | rDiagonal | filter1) & stencil;
+
+    while (safe) {
       var queen = safe & -safe;
       safe -= queen;
-      placeQueen ((lDiagonal | queen) >> 1, columns | queen, (rDiagonal | queen) << 1);
+      placeQueen ((lDiagonal | queen) >> 1, columns | queen, (rDiagonal | queen) << 1, filter2, 0);
+      filter2 = 0;
     }
   };
-  placeQueen(0, 0, 0);
-  return count;
+  placeQueen(0, 0, 0, firstStencil, n%2 ? firstStencil : 0);
+  return count*2;
 };
